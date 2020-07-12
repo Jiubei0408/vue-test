@@ -43,6 +43,12 @@
                         </span>
                     </template>
                 </el-table-column>
+                <el-table-column prop="confirmed" title="操作" width="200px">
+                    <template slot-scope="scope">
+                        <el-button v-if="!scope.row.confirmed" @click="confirmNotify(scope.row.id - 1)">确认</el-button>
+                        <el-button v-else disabled>已确认</el-button>
+                    </template>
+                </el-table-column>
             </el-table>
         </el-card>
     </div>
@@ -60,12 +66,38 @@
         methods: {
             refreshData() {
                 this.loading = true
-                const that = this
-                this.$store.commit('getNotifyList', data => {
-                    that.notify_list = data
-                    that.loading = false
-                })
+                let data = []
+                for (let i = 1; i <= 10; i++) {
+                    data.push({
+                        id: i,
+                        title: "test" + i,
+                        count: i,
+                        creator: "test",
+                        total: 10,
+                        detail: "波波鸽太强啦！！！".repeat(100),
+                        confirmed: false
+                    })
+                }
+                this.notify_list = data
+                this.loading = false
             },
+            confirmNotify(id) {
+                let api = this.$store.api
+                let that = this
+                this.notify_list[id].confirmed = true
+                return
+                // eslint-disable-next-line no-unreachable
+                this.$http.post(api + '/confirm/' + id)
+                    .then(data => {
+                        if (data.data.status)
+                            that.notify_list[id].confirmed = true
+                        else
+                            that.$message.error(data.data.msg)
+                    })
+                    .catch(error => {
+                        that.$message.error(error.response.statusText)
+                    })
+            }
         },
         created() {
             this.refreshData()
