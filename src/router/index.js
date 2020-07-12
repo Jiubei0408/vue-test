@@ -15,6 +15,11 @@ export default new Router({
             name: '列表',
             component: () => import('@/components/page/HelloWorld2'),
         },
+        {
+            path: '*',
+            name: 'error',
+            component: () => import('@/components/page/error')
+        }
     ],
     scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {
