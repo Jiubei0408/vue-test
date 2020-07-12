@@ -6,7 +6,12 @@ Vue.use(Vuex)
 const api = location.hostname + ':5000/api'
 let state = {
     app: null,
-    api: api
+    api: api,
+    user: {
+        userid: 1,
+        nickname: "",
+        permission: 1
+    }
 }
 
 let mutations = {
