@@ -8,12 +8,12 @@ export default new Router({
         {
             path: '/',
             name: '首页',
-            component: () => import('@/components/page/HelloWorld'),
+            component: () => import('@/components/page/index'),
         },
         {
             path: '/list',
             name: '列表',
-            component: () => import('@/components/page/HelloWorld2'),
+            component: () => import('@/components/page/list'),
         },
         {
             path: '*',
