@@ -19,26 +19,6 @@ let mutations = {
                 state.user = data.data
             })
     },
-    getNotifyList(state, cb) {
-        let data = []
-        for (let i = 1; i <= 10; i++) {
-            data.push({
-                id: i,
-                title: "test" + i,
-                count: i,
-                creator: "test",
-                total: 10,
-                detail: "波波鸽太强啦！！！".repeat(100)
-            })
-        }
-        cb(data)
-        return
-        // eslint-disable-next-line no-unreachable
-        state.app.$http.get(api + '/notify_list')
-            .then(data => {
-                cb(data.data)
-            })
-    }
 }
 
 export default new Vuex.Store({
