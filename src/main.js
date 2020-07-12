@@ -19,6 +19,6 @@ new Vue({
     store,
     render: h => h(App),
     created() {
-        store.app = this
+        store.commit('initApp', this)
     }
 }).$mount('#app')
