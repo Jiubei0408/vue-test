@@ -13,6 +13,7 @@
 
 <script>
     import PageNav from "@/components/page-item/page-nav"
+
     export default {
         name: 'app',
         components: {
@@ -22,7 +23,7 @@
             return {}
         },
         methods: {
-            fixbox() {
+            adjustSize() {
                 this.clientHeight = window.innerHeight
                 this.clientWidth = window.innerWidth
                 this.$refs.pageBox.style.height = this.clientHeight + 'px'
@@ -30,10 +31,10 @@
             }
         },
         mounted() {
-            this.fixbox()
+            this.adjustSize()
             const that = this
             window.onresize = () => {
-                that.fixbox()
+                that.adjustSize()
             }
         }
     }
