@@ -16,6 +16,11 @@ export default new Router({
             component: () => import('@/components/page/list'),
         },
         {
+            path: '/login',
+            name: '登录',
+            component: () => import('@/components/page/login')
+        },
+        {
             path: '*',
             name: 'error',
             component: () => import('@/components/page/error')

@@ -4,7 +4,7 @@
             <div id="appBox">
                 <page-nav/>
                 <div class="page-main-box">
-                    <router-view/>
+                    <router-view v-if="!isReloading"/>
                 </div>
             </div>
         </el-scrollbar>
@@ -20,14 +20,27 @@
             'page-nav': PageNav
         },
         data() {
-            return {}
+            return {
+                isReloading: false
+            }
         },
         methods: {
+            reload() {
+                this.isReloading = true
+                this.$nextTick(() => {
+                    this.isReloading = false
+                })
+            },
             adjustSize() {
                 this.clientHeight = window.innerHeight
                 this.clientWidth = window.innerWidth
-                this.$refs.pageBox.style.height = this.clientHeight + 'px'
+                this.$refs.pageBox.style.height = this.clientHeight - 5 + 'px'
                 this.$refs.pageBox.style.widows = this.clientWidth + 'px'
+            }
+        },
+        provide() {
+            return {
+                reload: this.reload
             }
         },
         mounted() {

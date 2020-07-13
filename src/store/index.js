@@ -8,9 +8,9 @@ let state = {
     app: null,
     api: api,
     user: {
-        username: "admin",
-        nickname: "admin",
-        permission: 1
+        username: '',
+        nickname: '',
+        permission: 0,
     }
 }
 
@@ -23,7 +23,44 @@ let mutations = {
             .then(response => {
                 state.user = response.data.data
             })
+            .catch(() => {
+                state.user = {
+                    username: '',
+                    nickname: '',
+                    permission: 0,
+                }
+            })
     },
+    login(state, data) {
+        state.app.$http.post(api + '/session', {
+            username: data.username,
+            password: data.password
+        })
+            .then(response => {
+                state.app.$store.commit('getUser')
+                state.app.$message.success(response.data.msg)
+                state.app.$router.push('/')
+            })
+            .catch(error => {
+                if (error.response) {
+                    state.app.$message.error(error.response.data.msg)
+                }
+            })
+    },
+    logout(state) {
+        state.app.$http.delete(api + '/session')
+            .then(response => {
+                state.app.$store.commit('getUser')
+                state.app.$message.success(response.data.msg)
+                if (state.app.$route.path === '/') state.app.$router.go(0)
+                else state.app.$router.push('/')
+            })
+            .catch(error => {
+                if (error.response) {
+                    state.app.$message.error(error.response.data.msg)
+                }
+            })
+    }
 }
 
 export default new Vuex.Store({
