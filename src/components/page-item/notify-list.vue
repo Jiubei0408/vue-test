@@ -42,22 +42,24 @@
                             <el-button @click="openDetail(scope.row)">
                                 通知详情
                             </el-button>
-                            <el-button
-                                    v-if="$store.state.user.permission === 1"
-                                    @click="openConfirmDetail(scope.row)">
-                                完成情况
-                            </el-button>
-                            <el-button
-                                    v-if="!scope.row.confirmed"
-                                    @click="confirmNotify(scope.row)">
-                                确认
-                            </el-button>
-                            <el-button v-else disabled>已确认</el-button>
-                            <el-button
-                                    v-if="$store.state.user.permission === 1"
-                                    @click="delNotify(scope.row)">
-                                删除
-                            </el-button>
+                            <template v-if="$store.state.user.username">
+                                <el-button
+                                        v-if="$store.state.user.permission === 1"
+                                        @click="openConfirmDetail(scope.row)">
+                                    完成情况
+                                </el-button>
+                                <el-button
+                                        v-if="!scope.row.confirmed"
+                                        @click="confirmNotify(scope.row)">
+                                    确认
+                                </el-button>
+                                <el-button v-else disabled>已确认</el-button>
+                                <el-button
+                                        v-if="$store.state.user.permission === 1"
+                                        @click="delNotify(scope.row)">
+                                    删除
+                                </el-button>
+                            </template>
                         </div>
                     </template>
                 </el-table-column>
