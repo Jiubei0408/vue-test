@@ -20,5 +20,6 @@ new Vue({
     render: h => h(App),
     created() {
         store.commit('initApp', this)
+        store.commit('getUser')
     }
 }).$mount('#app')

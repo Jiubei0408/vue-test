@@ -5,7 +5,8 @@
                 通知列表 <span v-if="notify_list.length > 0">共 {{notify_list.length}} 条</span></b>
         </div>
         <el-card shadow="hover">
-            <el-table ref="table" :expand-row-keys="expand_row" row-key="id" v-loading="loading" :data="notify_list"
+            <el-table id="table" ref="table" :expand-row-keys="expand_row" row-key="id" v-loading="loading"
+                      :data="notify_list"
                       stripe>
                 <el-table-column
                         prop="id"
@@ -38,48 +39,65 @@
                 <el-table-column label="操作" width="500">
                     <template slot-scope="scope">
                         <div>
-                            <el-button @click="openDetail(scope.row.id)">
+                            <el-button @click="openDetail(scope.row)">
                                 通知详情
                             </el-button>
                             <el-button
                                     v-if="$store.state.user.permission === 1"
-                                    @click="openConfirmDetail(scope.row.id)">
+                                    @click="openConfirmDetail(scope.row)">
                                 完成情况
                             </el-button>
                             <el-button
                                     v-if="!scope.row.confirmed"
-                                    @click="confirmNotify(scope.row.id)">
+                                    @click="confirmNotify(scope.row)">
                                 确认
                             </el-button>
                             <el-button v-else disabled>已确认</el-button>
                             <el-button
                                     v-if="$store.state.user.permission === 1"
-                                    @click="delNotify(scope.row.id)">
+                                    @click="delNotify(scope.row)">
                                 删除
                             </el-button>
                         </div>
                     </template>
                 </el-table-column>
                 <el-table-column
-                        v-if="isDetail"
                         type="expand"
                         width="1">
                     <template slot-scope="props">
-                        <el-form v-loading="detailLoading">
+                        <el-form
+                                v-if="isDetail"
+                                v-loading="isDetailLoading">
                             <el-form-item label="通知详情">
                                 <span style="word-wrap: break-word">{{props.row.detail}}</span>
                             </el-form-item>
                         </el-form>
-                    </template>
-                </el-table-column>
-                <el-table-column
-                        v-if="isConfirmDetail"
-                        type="expand"
-                        width="1">
-                    <template slot-scope="props">
-                        <el-form v-loading="confirmDetailLoading">
+                        <el-form
+                                v-if="isConfirmDetail"
+                                v-loading="isConfirmDetailLoading">
                             <el-form-item label="完成详情">
-                                <span style="word-wrap: break-word">{{props.row.confirmDetail}}</span>
+                                <br>
+                                <div v-if="props.row.checked.length > 0">
+                                    <p>已完成:</p>
+                                    <el-link
+                                            style="margin-right: 5px"
+                                            :underline="false"
+                                            v-for="i in props.row.checked"
+                                            :key="i.username">
+                                        {{i.nickname}}
+                                    </el-link>
+                                    <el-divider v-if="props.row.unchecked.length > 0"/>
+                                </div>
+                                <div v-if="props.row.unchecked.length > 0">
+                                    <p>未完成:</p>
+                                    <el-link
+                                            style="margin-right: 5px;"
+                                            :underline="false"
+                                            v-for="i in props.row.unchecked"
+                                            :key="i.username">
+                                        {{i.nickname}}
+                                    </el-link>
+                                </div>
                             </el-form-item>
                         </el-form>
                     </template>
@@ -97,9 +115,9 @@
                 loading: false,
                 notify_list: [],
                 isDetail: false,
-                detailLoading: false,
+                isDetailLoading: false,
                 isConfirmDetail: false,
-                confirmDetailLoading: false,
+                isConfirmDetailLoading: false,
                 expand_row: []
             }
         },
@@ -107,76 +125,97 @@
             refreshData() {
                 this.loading = true
                 let data = []
-                for (let i = 1; i <= 10; i++) {
-                    data.push({
-                        id: i,
-                        title: "test" + i,
-                        count: i,
-                        creator: "test",
-                        total: 10,
-                        confirmed: false,
-                        confirmDetail: "test"
+                let api = this.$store.state.api
+                this.$http.get(api + '/notification/summary')
+                    .then(response => {
+                        data = response.data.data
+                        data.forEach(item => {
+                            item.checked = []
+                            item.unchecked = []
+                        })
+                        this.notify_list = data
+                        this.loading = false
                     })
-                }
-                this.notify_list = data
-                this.loading = false
             },
-            openDetail(id) {
+            openDetail(row) {
                 let that = this
-                if (this.isDetail && this.expand_row.includes(id.toString())) {
-                    this.expand_row = []
+                let api = this.$store.state.api
+                let id = this.notify_list.indexOf(row)
+                let item = this.notify_list[id]
+                if (this.isDetail && this.expand_row.includes(row.id.toString())) {
                     this.isDetail = false
-                    return
-                }
-                this.expand_row = []
-                this.isDetail = true
-                this.isConfirmDetail = false
-                this.detailLoading = true
-                that.notify_list[id - 1].detail = ""
-                this.expand_row = [id.toString()]
-                setTimeout(() => {
-                    that.notify_list[id - 1].detail = "波波鸽太强啦！！！".repeat(100)
-                    that.detailLoading = false
-                }, 1000)
-            },
-            openConfirmDetail(id) {
-                let that = this
-                if (this.isConfirmDetail && this.expand_row.includes(id.toString())) {
                     this.expand_row = []
+                } else {
                     this.isConfirmDetail = false
-                    return
+                    this.isDetail = true;
+                    this.isDetailLoading = true
+                    item.detail = ""
+                    this.expand_row = [row.id.toString()]
+                    this.$http.get(api + '/notification/detail/' + row.id)
+                        .then(response => {
+                            item.detail = response.data.data
+                            that.isDetailLoading = false
+                        })
+                        .catch(error => {
+                            that.$message.error(error.response.data.msg)
+                        })
                 }
-                console.log(this.expand_row)
-                this.expand_row = []
-                this.isDetail = false
-                this.isConfirmDetail = true
-                this.confirmDetailLoading = true
-                that.notify_list[id - 1].confirmDetail = ""
-                this.expand_row = [id.toString()]
-                setTimeout(() => {
-                    that.notify_list[id - 1].confirmDetail = "zzg太菜啦！！！".repeat(100)
-                    that.confirmDetailLoading = false
-                }, 1000)
             },
-            confirmNotify(id) {
-                let api = this.$store.api
+            openConfirmDetail(row) {
                 let that = this
-                this.notify_list[id - 1].confirmed = true
-                return
-                // eslint-disable-next-line no-unreachable
-                this.$http.post(api + '/confirm/' + id)
-                    .then(data => {
-                        if (data.data.status)
-                            that.notify_list[id].confirmed = true
-                        else
-                            that.$message.error(data.data.msg)
+                let api = this.$store.state.api
+                let id = this.notify_list.indexOf(row)
+                let item = this.notify_list[id]
+                if (this.isConfirmDetail && this.expand_row.includes(row.id.toString())) {
+                    this.isConfirmDetail = false
+                    this.expand_row = []
+                } else {
+                    this.isDetail = false
+                    this.isConfirmDetail = true;
+                    this.isConfirmDetailLoading = true
+                    this.expand_row = [row.id.toString()]
+                    this.$http.get(api + '/notification/confirm_detail/' + row.id)
+                        .then(response => {
+                            let data = response.data.res
+                            item.checked = data.checked
+                            item.unchecked = data.unchecked
+                            that.isConfirmDetailLoading = false
+                        })
+                        .catch(error => {
+                            that.$message.error(error.response.data.msg)
+                        })
+                }
+            },
+            confirmNotify(row) {
+                let api = this.$store.state.api
+                let that = this
+                let id = this.notify_list.indexOf(row)
+                let item = that.notify_list[id]
+                this.$http.post(api + '/notification/confirm/' + row.id)
+                    .then(() => {
+                        item.confirmed = true
+                        item.count++
+                        let username = that.$store.state.user.username
+                        let nickname = that.$store.state.user.nickname
+                        if (that.isConfirmDetail) {
+                            item.checked.push({
+                                username: username,
+                                nickname: nickname
+                            })
+                            for (let i = 0; i < item.unchecked.length; i++) {
+                                if (item.unchecked[i].username === username) {
+                                    item.unchecked.splice(i, 1)
+                                    break
+                                }
+                            }
+                        }
                     })
                     .catch(error => {
-                        that.$message.error(error.response.statusText)
+                        that.$message.error(error.response.data.msg)
                     })
             },
-            delNotify(id) {
-                return id
+            delNotify(row) {
+                return row
             }
         },
         created() {
@@ -190,6 +229,10 @@
         text-align: center;
         font-size: 20px;
         padding-bottom: 10px;
+    }
+
+    #table .el-divider--horizontal {
+        margin: 2px;
     }
 
     .el-form-item__label {

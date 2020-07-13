@@ -3,13 +3,13 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-const api = location.hostname + ':5000/api'
+const api = 'http://' + location.hostname + ':5000'
 let state = {
     app: null,
     api: api,
     user: {
-        userid: 1,
-        nickname: "",
+        username: "admin",
+        nickname: "admin",
         permission: 1
     }
 }
@@ -20,8 +20,8 @@ let mutations = {
     },
     getUser(state) {
         state.app.$http.get(api + '/session')
-            .then(data => {
-                state.user = data.data
+            .then(response => {
+                state.user = response.data.data
             })
     },
 }
