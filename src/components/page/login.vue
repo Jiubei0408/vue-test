@@ -52,7 +52,7 @@
                     if (valid)
                         this.$store.commit('login', {
                             username: this.LoginForm.username,
-                            password: this.LoginForm.username
+                            password: this.LoginForm.password
                         })
                 })
             }
