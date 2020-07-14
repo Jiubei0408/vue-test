@@ -1,5 +1,5 @@
 <template>
-    <div id="app" ref="pageBox">
+    <div id="app" ref="page-box">
         <el-scrollbar class="scrollbar">
             <div id="appBox">
                 <page-nav/>
@@ -34,8 +34,8 @@
             adjustSize() {
                 this.clientHeight = window.innerHeight
                 this.clientWidth = window.innerWidth
-                this.$refs.pageBox.style.height = this.clientHeight - 5 + 'px'
-                this.$refs.pageBox.style.widows = this.clientWidth + 'px'
+                this.$refs['page-box'].style.height = this.clientHeight - 5 + 'px'
+                this.$refs['page-box'].style.widows = this.clientWidth + 'px'
             }
         },
         provide() {
