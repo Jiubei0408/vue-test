@@ -3,6 +3,12 @@
         <div class="tableTitle">
             <b>
                 通知列表 <span v-if="notify_list.length > 0">共 {{notify_list.length}} 条</span></b>
+            <el-button
+                    size="mini"
+                    @click.prevent="generateTest"
+                    v-if="$store.state.user.permission === 1">
+                生成测试数据
+            </el-button>
         </div>
         <el-card shadow="hover">
             <el-table id="table" ref="table" :expand-row-keys="expand_row" row-key="id" v-loading="loading"
@@ -217,7 +223,30 @@
                     })
             },
             delNotify(row) {
-                return row
+                let api = this.$store.state.api
+                let that = this
+                this.$http.delete(api + '/notification/' + row.id)
+                    .then(response => {
+                        that.$message.success(response.data.msg)
+                        that.refreshData()
+                    })
+                    .catch(error => {
+                        that.$message.error(error.response.data.msg)
+                    })
+            },
+            generateTest() {
+                let api = this.$store.state.api
+                let that = this
+                this.$http.post(api + '/notification/test')
+                    .then(response => {
+                        that.$message.success(response.data.msg)
+                        that.refreshData()
+                    })
+                    .catch(error => {
+                        if (error.response) {
+                            that.$message.error(error.response.data.msg)
+                        }
+                    })
             }
         },
         created() {
@@ -230,7 +259,11 @@
     .tableTitle {
         text-align: center;
         font-size: 20px;
-        padding-bottom: 10px;
+        margin: 10px;
+    }
+
+    .tableTitle b {
+        margin: 10px;
     }
 
     #table .el-divider--horizontal {
