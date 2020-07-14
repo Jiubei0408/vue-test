@@ -64,6 +64,7 @@
     #login-box {
         position: relative;
         left: 50%;
+        top: 150px;
         transform: translate(-50%, 0);
         width: 500px;
     }
