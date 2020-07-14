@@ -4,8 +4,11 @@
             <b>
                 通知列表 <span v-if="notify_list.length > 0">共 {{notify_list.length}} 条</span></b>
             <el-button
-                    size="mini"
+                    round
+                    ref="btn-generate"
+                    size="medium"
                     @click.prevent="generateTest"
+                    :loading="generating"
                     v-if="$store.state.user.permission === 1">
                 生成测试数据
             </el-button>
@@ -126,7 +129,8 @@
                 isDetailLoading: false,
                 isConfirmDetail: false,
                 isConfirmDetailLoading: false,
-                expand_row: []
+                expand_row: [],
+                generating: false
             }
         },
         methods: {
@@ -237,13 +241,16 @@
             generateTest() {
                 let api = this.$store.state.api
                 let that = this
+                this.generating = true
                 this.$http.post(api + '/notification/test')
                     .then(response => {
                         that.$message.success(response.data.msg)
+                        that.generating = false
                         that.refreshData()
                     })
                     .catch(error => {
                         if (error.response) {
+                            that.generating = false
                             that.$message.error(error.response.data.msg)
                         }
                     })
