@@ -54,8 +54,7 @@ let mutations = {
             .then(response => {
                 state.app.$store.commit('getUser')
                 state.app.$message.success(response.data.msg)
-                if (state.app.$route.path === '/') state.app.$router.go(0)
-                else state.app.$router.push('/')
+                state.app.$router.push('/')
             })
             .catch(error => {
                 if (error.response) {

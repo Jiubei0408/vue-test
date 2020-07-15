@@ -37,7 +37,7 @@
                             <el-progress
                                     style="width: 60%; padding-right: 8px; color: black !important;"
                                     :stroke-width="20"
-                                    :percentage="scope.row.count / scope.row.total * 100"
+                                    :percentage="(scope.row.count / scope.row.total * 100).toFixed(0)"
                                     show-text
                                     text-inside>
                             </el-progress>
@@ -135,6 +135,7 @@
         },
         methods: {
             refreshData() {
+                Object.assign(this.$data, this.$options.data())
                 this.loading = true
                 let data = []
                 let api = this.$store.state.api
@@ -287,6 +288,11 @@
         },
         created() {
             this.refreshData()
+        },
+        watch: {
+            '$store.state.user'() {
+                this.refreshData()
+            }
         }
     }
 </script>
@@ -308,5 +314,10 @@
 
     .el-form-item__label {
         color: #99a9bf;
+    }
+
+    .el-progress-bar__innerText{
+        color: black;
+        font-weight: bold;
     }
 </style>
