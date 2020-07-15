@@ -44,6 +44,8 @@ let mutations = {
             .catch(error => {
                 if (error.response) {
                     state.app.$message.error(error.response.data.msg)
+                }else{
+                    state.app.$message.error("无法连接到服务器")
                 }
             })
     },
@@ -58,6 +60,8 @@ let mutations = {
             .catch(error => {
                 if (error.response) {
                     state.app.$message.error(error.response.data.msg)
+                }else{
+                    state.app.$message.error("无法连接到服务器")
                 }
             })
     }

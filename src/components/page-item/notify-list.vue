@@ -138,6 +138,7 @@
                 this.loading = true
                 let data = []
                 let api = this.$store.state.api
+                let that = this
                 this.$http.get(api + '/notification/summary')
                     .then(response => {
                         data = response.data.data
@@ -147,6 +148,14 @@
                         })
                         this.notify_list = data
                         this.loading = false
+                    })
+                    .catch(error => {
+                        this.loading = false
+                        if (error.response) {
+                            that.$message.error(error.response.data.msg)
+                        } else {
+                            that.$message.error("无法连接到服务器")
+                        }
                     })
             },
             openDetail(row) {
@@ -169,7 +178,12 @@
                             that.isDetailLoading = false
                         })
                         .catch(error => {
-                            that.$message.error(error.response.data.msg)
+                            that.isDetailLoading = false
+                            if (error.response) {
+                                that.$message.error(error.response.data.msg)
+                            } else {
+                                that.$message.error("无法连接到服务器")
+                            }
                         })
                 }
             },
@@ -194,7 +208,12 @@
                             that.isConfirmDetailLoading = false
                         })
                         .catch(error => {
-                            that.$message.error(error.response.data.msg)
+                            that.isConfirmDetailLoading = false
+                            if (error.response) {
+                                that.$message.error(error.response.data.msg)
+                            } else {
+                                that.$message.error("无法连接到服务器")
+                            }
                         })
                 }
             },
@@ -223,7 +242,11 @@
                         }
                     })
                     .catch(error => {
-                        that.$message.error(error.response.data.msg)
+                        if (error.response) {
+                            that.$message.error(error.response.data.msg)
+                        } else {
+                            that.$message.error("无法连接到服务器")
+                        }
                     })
             },
             delNotify(row) {
@@ -235,7 +258,11 @@
                         that.refreshData()
                     })
                     .catch(error => {
-                        that.$message.error(error.response.data.msg)
+                        if (error.response) {
+                            that.$message.error(error.response.data.msg)
+                        } else {
+                            that.$message.error("无法连接到服务器")
+                        }
                     })
             },
             generateTest() {
@@ -249,9 +276,11 @@
                         that.refreshData()
                     })
                     .catch(error => {
+                        that.generating = false
                         if (error.response) {
-                            that.generating = false
                             that.$message.error(error.response.data.msg)
+                        } else {
+                            that.$message.error("无法连接到服务器")
                         }
                     })
             }
